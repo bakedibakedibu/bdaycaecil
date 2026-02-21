@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Gift for You ✨</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:italic,wght@0,400;1,700&family=Poppins:wght@200;300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --dark: #0a0a0a;
+            --glass: rgba(255, 255, 255, 0.03);
+            --transition-speed: 1.2s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--dark);
+            color: #fff;
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden; 
+            height: 100vh;
+        }
+
+        /* --- SISTEM TRANSISI HALAMAN --- */
+        .page {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(1.05);
+            transition: opacity var(--transition-speed) ease, 
+                        transform var(--transition-speed) ease,
+                        visibility var(--transition-speed);
+            padding: 20px;
+            text-align: center;
+            background: radial-gradient(circle at center, #111 0%, #000 100%);
+        }
+
+        .page.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1);
+            z-index: 10;
+        }
+
+        /* --- TYPOGRAPHY & BUTTONS --- */
+        .gold-text { color: var(--gold); }
+        .cinzel { font-family: 'Cinzel', serif; letter-spacing: 4px; }
+        .playfair { font-family: 'Playfair Display', serif; font-style: italic; }
+
+        .btn-mewah {
+            margin-top: 30px;
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 12px 35px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            letter-spacing: 3px;
+            font-weight: 600;
+            transition: 0.5s;
+            text-transform: uppercase;
+            z-index: 100;
+        }
+
+        .btn-mewah:hover {
+            background: var(--gold);
+            color: #000;
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-mewah:disabled { opacity: 0.2; cursor: not-allowed; }
+
+        /* --- PAGE 0: COUNTDOWN --- */
+        .countdown-box {
+            background: var(--glass);
+            padding: 50px 30px;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            backdrop-filter: blur(10px);
+        }
+        #timer { font-size: 2.5rem; margin-bottom: 20px; font-weight: 300; }
+
+        /* --- PAGE 1: HERO IMAGE --- */
+        .hero-img {
+            width: 240px; height: 320px;
+            object-fit: cover;
+            border: 1px solid var(--gold);
+            padding: 8px;
+            background: white;
+            margin: 20px 0;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            transform: rotate(-2deg);
+        }
+
+        /* --- PAGE 2: POLAROID GRID --- */
+        .grid-polaroid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .polaroid-item {
+            background: #fff;
+            padding: 8px 8px 25px 8px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            transform: rotate(var(--rot));
+        }
+        .polaroid-item img { width: 120px; height: 120px; object-fit: cover; }
+        .polaroid-item p { color: #333; font-size: 0.6rem; margin-top: 8px; font-weight: 600; }
+
+        /* --- PAGE 3: CANDID --- */
+        .candid-circle {
+            width: 180px; height: 180px;
+            border-radius: 50%;
+            border: 2px solid var(--gold);
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+        .quote { max-width: 450px; line-height: 1.8; color: #ccc; font-size: 0.9rem; font-weight: 300; }
+
+        /* --- PAGE 4: ENVELOPE & LETTER (SCROLLABLE) --- */
+        .envelope-container {
+            width: 280px;
+            height: 160px;
+            border: 1px solid var(--gold);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            cursor: pointer;
+            transition: 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .letter {
+            position: absolute;
+            width: 90%; 
+            height: 0;
+            background: #fff;
+            color: #222;
+            top: 50%;
+            transform: translateY(-50%);
+            overflow: hidden; 
+            transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 0 20px;
+            text-align: left;
+            border-radius: 3px;
+            z-index: 10;
+        }
+
+        /* Saat Amplop Terbuka */
+        .envelope-container.open { 
+            height: 420px; 
+            background: #fff; 
+            border-color: #fff;
+            cursor: default;
+        }
+        .envelope-container.open .letter { 
+            height: 380px; 
+            top: 50%;
+            padding: 30px 20px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; 
+        }
+        .envelope-container.open span { display: none; }
+
+        /* Scrollbar Mewah */
+        .letter::-webkit-scrollbar { width: 4px; }
+        .letter::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+        /* Flower Decor */
+        .flower { position: absolute; pointer-events: none; z-index: 999; font-size: 18px; }
+
+    </style>
+</head>
+<body>
+
+    <audio id="bgMusic" loop>
+        <source src="https://cdn.discordapp.com/attachments/1474482670976368653/1474482746515525813/Kasih_-_Aera.mp3?ex=699a0291&is=6998b111&hm=4b109b55174368fcd43e09eb4aa60d900f023a996005470dd9e417faa3549da4&" type="audio/mpeg">
+    </audio>
+
+    <section id="page-0" class="page active">
+        <div class="countdown-box">
+            <p class="cinzel" style="font-size: 0.7rem; margin-bottom: 15px;">Waiting for the Golden Hour</p>
+            <div id="timer" class="cinzel gold-text">00:00:00:00</div>
+            <button class="btn-mewah" id="main-btn" onclick="goTo(1)" disabled>Pencet Aku ✨</button>
+        </div>
+    </section>
+
+    <section id="page-1" class="page">
+        <h2 class="cinzel gold-text" style="font-size: 0.7rem;">CHAPTER ONE</h2>
+        <h1 class="playfair" style="font-size: 2.8rem; margin-top: 10px;">Happy Birthday, Sayang</h1>
+        
+        <img src="https://i.ibb.co.com/j93QcCC6/c55b1c9b-dff4-40e6-95cd-aabdb19b54de.jpg" class="hero-img">
+        
+        <button class="btn-mewah" onclick="goTo(2)">Next Journey</button>
+    </section>
+
+    <section id="page-2" class="page">
+        <h2 class="cinzel gold-text" style="font-size: 0.7rem; margin-bottom: 30px;">Our Captured Memories</h2>
+        <div class="grid-polaroid">
+            <div class="polaroid-item" style="--rot: -3deg;"><img src="https://i.ibb.co.com/4gXg3HYY/IMG-5471.jpg"><p>This is our first date di PG, do u remember this? abis nonton pabrik gula kita makan di solaria </p></div>
+            <div class="polaroid-item" style="--rot: 2deg;"><img src="https://i.ibb.co.com/0pLtNy05/38554d21-130f-40d9-8717-9b01407c6e9f.jpg"><p>This is first PAP without "view once" AHAHA kayaknya waktu itu kamu dibeliin donat sm pelatihmu</p></div>
+            <div class="polaroid-item" style="--rot: -1deg;"><img src="https://i.ibb.co.com/nMtL3HMC/IMG-9360.jpg"><p>This is our first fotbar AHAHA how awkward that time :P</p></div>
+            <div class="polaroid-item" style="--rot: 4deg;"><img src="https://i.ibb.co.com/C54P2cLB/IMG-6424.jpg"><p>And this is u first time nyender ke athuu, kamu waktu itu masih malu malu AHAHAHA, but cutee i love this one🤭</p></div>
+        </div>
+        <button class="btn-mewah" onclick="goTo(3)">More of You</button>
+    </section>
+
+    <section id="page-3" class="page">
+        <img src="https://i.ibb.co.com/DHtHCSs9/IMG-8361.jpg" class="candid-circle">
+        
+        <div class="quote playfair">
+            "Why is this photo here? It's not without reason, because in that photo, i held your hand for the first time. yes, i was still shy, but i like how we ended up holding hands. AHAHAHAHA, it's funny how we were both nervous, especially me hehe
+        </div>
+        
+        <button class="btn-mewah" onclick="goTo(4)">Open My Heart</button>
+    </section>
+
+    <section id="page-4" class="page">
+        <div class="envelope-container" onclick="this.classList.add('open')">
+            <span class="cinzel gold-text" style="font-size: 0.8rem;">Click to Open My Letter</span>
+            <div class="letter">
+                <h3 class="playfair" style="color: var(--gold); margin-bottom: 15px;">Dear sweetheart,</h3>
+                <p style="font-size: 0.85rem; line-height: 1.8; color: #444;">
+                    selamat ulang tahun!!! tau gasihh we've known each other for about a year, i think. n aku bersyukur bisa mengenalmu, belajar banyak darimu, dan tertawa bersamamu. but anyway let’s make a wish for ur b'day, tahun ini umur kamu bertambah satu tahun dan jatah hidup kamu berkurang satu tahun juga semoga kamu sehat, kmu skrg makin dewasa, apapun yang kamu inginkan bisa terjadi. terimakasih udh sekuat ini dan bertahan hidup, banyak hal yang sudah kmu laluin dan masih bnyk hal yng blm km laluin, semakin kamu dewasa semkin bnyk juga rintangannya but its okayyy karna masih bnyk orang yg sayang sama kmu, apapun susahnya apapun sedihnya apapun senangnya kamu nikmatin dan brsyukur semoga banyak kebahagiaan yang kembali dari hari ini.<br><br>
+                    semoga akan ada banyak kebahagiaan yang datang ke dalam hidupmu semoga harimu jauh lebih menyenangkan sesuai dengan harapan mu. sekali lagi selamat ulang tahun ya cantikk, terimakasih sudah menjadi kuat selama ini walaupun awalnya dikuat-kuatin aja dan selanjutnya harus selalu kuat dan bahagia. aku berharap semua doa-doa baikmu didengar oleh Tuhan dan aku juga ingin selalu ada di setiap ulang tahunmu berikutnya, melihatmu tumbuh, sukses, dan tetap menjadi orang yang sama.<br><br>
+                    Terima kasih sudah lahir ke dunia. I love u.<br><br>
+                    ---<br>
+                    
+                </p>
+                <p class="playfair" style="margin-top: 25px; font-weight: bold; color: #000; padding-bottom: 20px;">With Love, Bani ngeselin😋.</p>
+            </div>
+        </div>
+        <p id="hint-text" style="margin-top: 30px; font-size: 0.6rem; letter-spacing: 2px; color: #555;">special messege for my love</p>
+    </section>
+
+    <script>
+        // --- 1. SETEL TANGGAL ULTAH DI SINI ---
+        const birthdayDate = new Date("March 20, 2026 00:00:00").getTime();
+
+        // 2. Logika Countdown
+        const timerTask = setInterval(() => {
+            const now = new Date().getTime();
+            const diff = birthdayDate - now;
+
+            if (diff <= 0) {
+                clearInterval(timerTask);
+                document.getElementById("timer").innerText = "THE DAY IS HERE";
+                document.getElementById("main-btn").disabled = false;
+            } else {
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const s = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                const f = (n) => n < 10 ? "0" + n : n;
+                document.getElementById("timer").innerText = `${f(d)}:${f(h)}:${f(m)}:${f(s)}`;
+            }
+        }, 1000);
+
+        // 3. Navigasi Halaman
+        function goTo(num) {
+            // Logika Memutar Lagu saat pertama kali pindah halaman
+            const audio = document.getElementById("bgMusic");
+            if (num === 1) {
+                audio.play().catch(e => console.log("Audio play deferred"));
+                startFlowerRain();
+            }
+
+            // Efek Confetti (Meledak)
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#D4AF37', '#ffffff']
+            });
+
+            // Ganti Page
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + num).classList.add('active');
+        }
+
+        // 4. Animasi Bunga Jatuh
+        function startFlowerRain() {
+            setInterval(() => {
+                const f = document.createElement('div');
+                f.className = 'flower';
+                f.innerHTML = '🌸';
+                f.style.left = Math.random() * 100 + 'vw';
+                f.style.top = '-5vh';
+                document.body.appendChild(f);
+
+                f.animate([
+                    { transform: 'translateY(0) rotate(0deg)' },
+                    { transform: `translateY(110vh) rotate(${Math.random() * 360}deg)` }
+                ], {
+                    duration: 4000,
+                    easing: 'linear'
+                }).onfinish = () => f.remove();
+            }, 500);
+        }
+    </script>
+</body>
+</html>
