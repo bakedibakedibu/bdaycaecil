@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dinner Invitation</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    min-height:100vh;
+    overflow:hidden;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:
+    radial-gradient(circle at top,
+    #3d2b00 0%,
+    #111 35%,
+    #000 100%);
+    font-family:'Cinzel', serif;
+}
+
+/* SPARKLES */
+
+.sparkle{
+    position:absolute;
+    color:#d4af37;
+    font-size:22px;
+    animation:float 4s ease-in-out infinite;
+    opacity:.7;
+}
+
+.sparkle:nth-child(1){top:15%;left:15%;}
+.sparkle:nth-child(2){top:25%;right:12%;}
+.sparkle:nth-child(3){bottom:15%;left:20%;}
+.sparkle:nth-child(4){bottom:20%;right:18%;}
+
+@keyframes float{
+    0%,100%{
+        transform:translateY(0);
+    }
+    50%{
+        transform:translateY(-15px);
+    }
+}
+
+/* LETTER */
+
+.letter{
+    position:fixed;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,60px);
+
+    width:min(92vw,500px);
+    height:min(85vh,750px);
+
+    background:linear-gradient(
+    to bottom,
+    #fffef9,
+    #f7efd9);
+
+    border-radius:18px;
+
+    padding:40px;
+
+    box-shadow:
+    0 25px 60px rgba(0,0,0,.5);
+
+    text-align:center;
+
+    overflow-y:auto;
+    overflow-x:hidden;
+
+    opacity:0;
+    visibility:hidden;
+
+    transition:1.2s ease;
+
+    z-index:1;
+}
+
+.letter.show{
+    opacity:1;
+    visibility:visible;
+    transform:translate(-50%,-50%);
+}
+
+.letter::-webkit-scrollbar{
+    width:8px;
+}
+
+.letter::-webkit-scrollbar-thumb{
+    background:#d4af37;
+    border-radius:10px;
+}
+
+.letter::-webkit-scrollbar-track{
+    background:#efe3bd;
+}
+
+/* ENVELOPE */
+
+.envelope{
+    position:relative;
+    width:420px;
+    height:260px;
+    z-index:10;
+}
+
+.back{
+    position:absolute;
+    width:100%;
+    height:100%;
+    background:linear-gradient(
+    145deg,
+    #141414,
+    #222);
+
+    border:2px solid #d4af37;
+    border-radius:8px;
+}
+
+.flap{
+    position:absolute;
+    width:100%;
+    height:100%;
+
+    background:linear-gradient(
+    145deg,
+    #111,
+    #000);
+
+    clip-path:polygon(0 0,100% 0,50% 60%);
+    border-top:2px solid #d4af37;
+
+    transform-origin:top;
+    transition:1s ease;
+    z-index:3;
+}
+
+.envelope.open .flap{
+    transform:rotateX(180deg);
+}
+
+.seal{
+    position:absolute;
+    width:90px;
+    height:90px;
+
+    left:50%;
+    top:95px;
+
+    transform:translateX(-50%);
+
+    border-radius:50%;
+
+    background:
+    radial-gradient(circle,
+    #f7de8a,
+    #c59213);
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    color:#000;
+    font-size:28px;
+
+    z-index:5;
+
+    cursor:pointer;
+
+    box-shadow:
+    0 0 25px rgba(212,175,55,.7);
+
+    animation:pulse 2s infinite;
+}
+
+@keyframes pulse{
+    0%,100%{
+        transform:translateX(-50%) scale(1);
+    }
+    50%{
+        transform:translateX(-50%) scale(1.08);
+    }
+}
+
+.touch{
+    position:absolute;
+    width:100%;
+    text-align:center;
+    bottom:-50px;
+    color:#d4af37;
+    letter-spacing:3px;
+    font-size:12px;
+}
+
+.envelope.hide{
+    opacity:0;
+    visibility:hidden;
+    transition:1s ease;
+}
+
+/* CONTENT */
+
+.title{
+    font-family:'Great Vibes', cursive;
+    font-size:64px;
+    color:#b68a15;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    color:#8a8a8a;
+    letter-spacing:2px;
+    margin-bottom:25px;
+    font-style:italic;
+    font-size:15px;
+}
+
+.line{
+    width:120px;
+    height:2px;
+    background:#d4af37;
+    margin:25px auto;
+}
+
+.label{
+    color:#b68a15;
+    font-weight:700;
+    margin-top:20px;
+}
+
+.content{
+    color:#222;
+    line-height:2;
+    font-size:15px;
+}
+
+.footer{
+    margin-top:40px;
+    font-family:'Great Vibes', cursive;
+    font-size:36px;
+    color:#b68a15;
+}
+
+@media(max-width:500px){
+
+    .envelope{
+        width:330px;
+        height:210px;
+    }
+
+    .seal{
+        top:72px;
+    }
+
+    .title{
+        font-size:50px;
+    }
+
+    .letter{
+        padding:30px;
+    }
+}
+
+</style>
+</head>
+<body>
+
+<div class="sparkle">✦</div>
+<div class="sparkle">✦</div>
+<div class="sparkle">✦</div>
+<div class="sparkle">✦</div>
+
+<!-- LETTER -->
+
+<div class="letter" id="letter">
+
+    <div class="title">
+        Dinner Invitation
+    </div>
+
+    <div class="subtitle">
+        Intended for Caecilia
+    </div>
+
+    <div class="line"></div>
+
+    <div class="content">
+
+        <div class="label">Date</div>
+        15 June 2026
+
+        <div class="label">Venue</div>
+
+        <strong>Commoro Resto</strong><br>
+        Jl. Gajah Mungkur Selatan No.15b, Petompon, Kec. Gajahmungkur, Kota Semarang, Jawa Tengah 50232<br>
+
+        <div class="label">Dress Code</div>
+        Black Attire ⚫
+
+    </div>
+
+    <div class="footer">
+        See You Sayang
+    </div>
+
+</div>
+
+<!-- ENVELOPE -->
+
+<div class="envelope" id="envelope">
+
+    <div class="back"></div>
+
+    <div class="flap"></div>
+
+    <div class="seal" id="seal">
+        ✦
+    </div>
+
+    <div class="touch">
+        TOUCH THE WAX SEAL
+    </div>
+
+</div>
+
+<script>
+
+const seal = document.getElementById("seal");
+const envelope = document.getElementById("envelope");
+const letter = document.getElementById("letter");
+
+seal.addEventListener("click", () => {
+
+    envelope.classList.add("open");
+
+    setTimeout(() => {
+
+        envelope.classList.add("hide");
+        letter.classList.add("show");
+
+    }, 1000);
+
+});
+
+</script>
+
+</body>
+</html>
